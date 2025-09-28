@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Taixiu - SUN WIN (Full)</title>
+<style>
+:root{
+  --accent:#f39c12;
+  --card: rgba(255,255,255,0.06);
+  --muted:#cfcfcf;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(135deg,#072029,#15394b);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  min-height:100vh;
+  padding:12px;
+}
+
+/* header */
+.header{
+  width:100%;
+  max-width:980px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+}
+.brand{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.brand img{
+  width:84px;
+  height:84px;
+  border-radius:12px;
+  object-fit:cover;
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+.title{
+  font-size:28px;
+  color:gold;
+  font-weight:800;
+  text-shadow:0 4px 18px rgba(0,0,0,0.6);
+}
+
+/* layout */
+.main{
+  width:100%;
+  max-width:980px;
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:14px;
+}
+
+/* left column */
+.left{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* card */
+.card{
+  background:var(--card);
+  border-radius:12px;
+  padding:12px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.5);
+}
+
+/* auth */
+.auth-row{display:flex;gap:8px;align-items:center}
+input,select,button,textarea{
+  border-radius:8px;
+  border:none;
+  padding:8px 10px;
+  font-size:14px;
+}
+button{background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+button.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.08)}
+button:disabled{opacity:.5;cursor:not-allowed}
+
+/* plate */
+.plate{
+  width:230px;height:230px;border-radius:50%;
+  margin:10px auto;
+  position:relative;
+  background: radial-gradient(circle at 35% 35%, #7b2f2f 0%, #2b0f0f 45%, #190606 100%);
+  box-shadow: inset 0 -10px 40px rgba(0,0,0,0.6);
+}
+.cover{
+  position:absolute;inset:0;border-radius:50%;z-index:4;
+  background: radial-gradient(circle at 40% 35%, #ccc, #666 45%, #222 100%);
+  display:flex;align-items:center;justify-content:center;
+  transition: transform 900ms cubic-bezier(.2,.9,.3,1);
+  box-shadow:0 8px 20px rgba(0,0,0,0.5);
+}
+.cover.open{transform: translateY(-260px)}
+.dice-area{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;gap:8px;z-index:3
+}
+.dice{
+  width:64px;height:64px;border-radius:10px;background:#fff;color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;box-shadow:0 6px 12px rgba(0,0,0,0.45)
+}
+.shake{animation:shake 0.5s infinite}
+@keyframes shake{
+  0%{transform:translate(0,0) rotate(0deg)}
+  25%{transform:translate(-3px,2px) rotate(-2deg)}
+  50%{transform:translate(3px,-2px) rotate(2deg)}
+  75%{transform:translate(-2px,1px) rotate(-1deg)}
+  100%{transform:translate(0,0) rotate(0deg)}
+}
+
+/* history / soi cầu */
+.history-list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto;padding-right:6px}
+.hitem{display:flex;justify-content:space-between;gap:8px;padding:6px;border-radius:8px;background:rgba(255,255,255,0.02)}
+
+/* right column - chat + recharge */
+.right{display:flex;flex-direction:column;gap:12px}
+.chat-box{display:flex;flex-direction:column;gap:8px;max-height:420px}
+.chat-history{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px;max-height:300px;overflow:auto}
+.msg{padding:6px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.02)}
+.msg strong{display:block;color:var(--accent)}
+.controls{display:flex;gap:8px;align-items:center;}
+
+/* stats small */
+.stats{display:flex;gap:8px;align-items:center}
+.stat{background:rgba(255,255,255,0.03);padding:6px;border-radius:8px;font-weight:700;color:var(--muted)}
+
+/* footer */
+.footer{margin-top:8px;color:#ddd;font-size:13px;align-self:center;}
+@media (max-width:980px){
+  .main{grid-template-columns:1fr; padding-bottom:40px}
+  .right{order:2}
+  .left{order:1}
+  .plate{width:200px;height:200px}
+  .dice{width:52px;height:52px;font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- header -->
+<div class="header" style="width:100%;max-width:980px">
+  <div class="brand">
+    <img src="logo.jpg" alt="logo" id="logoImg">
+    <div>
+      <div class="title">SUN WIN</div>
+      <div style="font-size:13px;color:#ddd">Game Tài Xỉu - Vui vẻ, tiền ảo</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div id="topUser" style="color:#ddd"></div>
+    <button onclick="goToGit()" class="ghost">Repo</button>
+  </div>
+</div>
+
+<!-- main layout -->
+<div class="main">
+
+  <!-- left column -->
+  <div class="left">
+
+    <!-- auth card -->
+    <div class="card" id="authCard">
+      <h3>Đăng ký / Đăng nhập</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <input id="username" placeholder="Tên đăng nhập" />
+        <input id="password" placeholder="Mật khẩu" type="password" />
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button onclick="register()">Đăng ký (tặng 100M)</button>
+          <button onclick="login()">Đăng nhập</button>
+        </div>
+        <div style="font-size:13px;color:#ddd">Nếu đã đăng nhập thì load lại trang sẽ tự đăng nhập.</div>
+      </div>
+    </div>
+
+    <!-- game card -->
+    <div class="card" id="gameCard" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>Xin chào <strong id="currentUser">---</strong></div>
+        <div>Số dư: <strong id="balance">0</strong> đ</div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+        <select id="betChoice"><option value="Tài">Tài</option><option value="Xỉu">Xỉu</option></select>
+        <input id="betAmount" type="number" placeholder="Số tiền cược" />
+        <button id="playBtn" onclick="play()">Lắc xúc xắc</button>
+        <button onclick="logout()" style="background:#777">Đăng xuất</button>
+      </div>
+
+      <div class="plate" aria-hidden="true">
+        <div class="cover" id="cover"></div>
+        <div class="dice-area" id="diceArea">
+          <div class="dice" id="dice1">?</div>
+          <div class="dice" id="dice2">?</div>
+          <div class="dice" id="dice3">?</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="stats">
+          <div class="stat" id="statTai">Tài: 0</div>
+          <div class="stat" id="statXiu">Xỉu: 0</div>
+          <div class="stat" id="statTriple">Bộ3: 0</div>
+        </div>
+        <div style="font-size:13px;color:#ddd">Lịch sử: <span id="histCount">0</span> ván</div>
+      </div>
+
+      <div id="result" style="margin-top:10px;color:#ddd">Chọn cửa & đặt cược rồi Lắc.</div>
+    </div>
+
+    <!-- soi cầu / history -->
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Soi cầu / Lịch sử ván</h3>
+      <div class="history-list" id="historyList">
+        <!-- items -->
+      </div>
+      <div style="margin-top:8px;font-size:13px;color:#ccc">Hiển thị 10 ván gần nhất.</div>
+    </div>
+
+  </div>
+
+  <!-- right column -->
+  <div class="right">
+
+    <!-- chat -->
+    <div class="card chat-box">
+      <h3 style="margin:0">Chat (lưu local)</h3>
+      <div class="chat-history" id="chatHistory"></div>
+      <div class="controls">
+        <input id="chatInput" placeholder="Gõ tin nhắn..." style="flex:1" onkeydown="if(event.key==='Enter') sendChat()">
+        <button onclick="sendChat()">Gửi</button>
+        <button onclick="clearChat()" style="background:#aa4444">X</button>
+      </div>
+      <div style="font-size:12px;color:#ccc">Chat lưu trên trình duyệt (không realtime). Mọi người dùng cùng trình duyệt sẽ thấy.</div>
+    </div>
+
+    <!-- nap code -->
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Nạp mã nhận 100.000</h3>
+      <div style="display:flex;gap:8px">
+        <input id="codeInput" placeholder="Nhập mã (gõ gì cũng được)" />
+        <button onclick="redeemCode()">Nạp</button>
+      </div>
+      <div style="margin-top:8px;font-size:13px;color:#ddd">Mỗi mã chỉ sử dụng 1 lần cho 1 tài khoản.</div>
+      <div id="redeemMsg" style="margin-top:8px;color:#cfcfcf;font-size:13px"></div>
+    </div>
+
+    <!-- small info -->
+    <div class="card">
+      <div style="font-size:13px;color:#ddd">by: Đạt Gold</div>
+      <div style="font-size:12px;color:#bbb;margin-top:8px">Lưu ý: tiền ảo, chỉ vui vẻ. Chat và lịch sử lưu local (trình duyệt).</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- audio (bỏ file mp3 cùng thư mục) -->
+<audio id="soundShake" src="shake.mp3" preload="auto"></audio>
+<audio id="soundWin" src="win.mp3" preload="auto"></audio>
+<audio id="soundLose" src="lose.mp3" preload="auto"></audio>
+
+<script>
+/* STORAGE STRUCTURES:
+   users: { username: { password, balance:number, history:[], redeemed:[] } }
+   currentUser saved under localStorage 'taixiu_currentUser'
+   chat saved under localStorage 'taixiu_chat' => array of {user,text,ts}
+*/
+const STORAGE_USERS = 'taixiu_users_v1';
+const STORAGE_CUR = 'taixiu_currentUser';
+const STORAGE_CHAT = 'taixiu_chat_v1';
+
+let users = JSON.parse(localStorage.getItem(STORAGE_USERS) || '{}');
+let currentUser = null;
+let canPlay = true;
+
+// auto login if saved
+(function initAuto(){
+  const saved = localStorage.getItem(STORAGE_CUR);
+  if(saved && users[saved]){
+    currentUser = saved;
+    showGame();
+  }
+  renderChat();
+  renderHistoryList(); // in case local user has history
+})();
+
+function saveUsers(){ localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+
+function register(){
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  if(!u||!p){ alert('Nhập tên & mật khẩu!'); return; }
+  if(users[u]){ alert('Tài khoản đã tồn tại.'); return; }
+  users[u] = { password:p, balance:100000000, history:[], redeemed:[] };
+  saveUsers();
+  currentUser = u;
+  localStorage.setItem(STORAGE_CUR, u);
+  showGame();
+  alert('Đăng ký thành công! Đã tặng 100,000,000.');
+}
+
+function login(){
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value.trim();
+  if(!users[u] || users[u].password !== p){ alert('Sai tên hoặc mật khẩu!'); return; }
+  currentUser = u;
+  localStorage.setItem(STORAGE_CUR, u);
+  showGame();
+}
+
+function logout(){
+  currentUser = null;
+  localStorage.removeItem(STORAGE_CUR);
+  document.getElementById('gameCard').style.display = 'none';
+  document.getElementById('authCard').style.display = 'block';
+  document.getElementById('topUser').textContent = '';
+  document.getElementById('currentUser').textContent = '---';
+}
+
+// show game UI
+function showGame(){
+  document.getElementById('authCard').style.display = 'none';
+  document.getElementById('gameCard').style.display = 'block';
+  document.getElementById('currentUser').textContent = currentUser;
+  document.getElementById('topUser').textContent = currentUser;
+  updateBalance();
+  renderHistoryList();
+  renderStats();
+}
+
+function updateBalance(){
+  if(currentUser) document.getElementById('balance').textContent = users[currentUser].balance.toLocaleString();
+}
+
+/* PLAY GAME */
+function play(){
+  if(!currentUser){ alert('Bạn chưa đăng nhập!'); return; }
+  if(!canPlay){ alert('Đang chờ cooldown!'); return; }
+
+  const betChoice = document.getElementById('betChoice').value;
+  const betAmount = parseInt(document.getElementById('betAmount').value, 10);
+  if(!betAmount || betAmount <= 0){ alert('Nhập số tiền cược hợp lệ!'); return; }
+  if(betAmount > users[currentUser].balance){ alert('Số dư không đủ!'); return; }
+
+  canPlay = false;
+  const btn = document.getElementById('playBtn');
+  btn.disabled = true;
+
+  const cover = document.getElementById('cover');
+  const diceEls = [document.getElementById('dice1'), document.getElementById('dice2'), document.getElementById('dice3')];
+  diceEls.forEach(d=>{ d.classList.add('shake'); d.textContent = '?'; });
+  document.getElementById('result').textContent = 'Đang lắc...';
+
+  // play shake
+  try { const s = document.getElementById('soundShake'); s.currentTime = 0; s.play(); }catch(e){}
+
+  setTimeout(()=>{
+    const d1 = Math.floor(Math.random()*6)+1;
+    const d2 = Math.floor(Math.random()*6)+1;
+    const d3 = Math.floor(Math.random()*6)+1;
+    diceEls[0].textContent = d1;
+    diceEls[1].textContent = d2;
+    diceEls[2].textContent = d3;
+    diceEls.forEach(d=>d.classList.remove('shake'));
+
+    const total = d1 + d2 + d3;
+    let outcome = '';
+    if(total >= 4 && total <= 10) outcome = 'Xỉu';
+    else if(total >= 11 && total <= 17) outcome = 'Tài';
+    else outcome = 'Bộ Ba';
+
+    let resultText = `Tổng: ${total} — ${outcome}`;
+
+    if(outcome === betChoice){
+      users[currentUser].balance += betAmount;
+      resultText += ` ✅ Bạn thắng! +${betAmount.toLocaleString()}`;
+      try { const sw = document.getElementById('soundWin'); sw.currentTime = 0; sw.play(); }catch(e){}
+    } else {
+      users[currentUser].balance -= betAmount;
+      resultText += ` ❌ Bạn thua! -${betAmount.toLocaleString()}`;
+      try { const sl = document.getElementById('soundLose'); sl.currentTime = 0; sl.play(); }catch(e){}
+    }
+
+    // save history
+    const item = { d:[d1,d2,d3], total, outcome, ts: Date.now() };
+    if(!users[currentUser].history) users[currentUser].history = [];
+    users[currentUser].history.unshift(item); // newest first
+    // limit history length to 100
+    if(users[currentUser].history.length > 200) users[currentUser].history.length = 200;
+    saveUsers();
+    updateBalance();
+    document.getElementById('result').textContent = resultText;
+    cover.classList.add('open');
+    renderHistoryList();
+    renderStats();
+
+    // cooldown 30s with countdown
+    let countdown = 30;
+    const interval = setInterval(()=>{
+      document.getElementById('result').textContent = resultText + ` | Đợi ${countdown}s để chơi lại`;
+      countdown--;
+      if(countdown < 0){
+        clearInterval(interval);
+        btn.disabled = false;
+        canPlay = true;
+        document.getElementById('result').textContent = 'Bạn có thể chơi tiếp!';
+      }
+    },1000);
+
+  },1500);
+}
+
+/* RENDER HISTORY (soi cầu) */
+function renderHistoryList(){
+  const wrap = document.getElementById('historyList');
+  wrap.innerHTML = '';
+  if(!currentUser || !users[currentUser] || !users[currentUser].history || users[currentUser].history.length === 0){
+    wrap.innerHTML = '<div style="color:#bbb">Chưa có ván nào.</div>';
+    document.getElementById('histCount').textContent = 0;
+    renderStats();
+    return;
+  }
+  const arr = users[currentUser].history.slice(0,10); // last 10
+  arr.forEach((it,idx)=>{
+    const dText = it.d.join(', ');
+    const date = new Date(it.ts);
+    const dateStr = date.toLocaleString();
+    const el = document.createElement('div');
+    el.className = 'hitem';
+    el.innerHTML = `<div><strong>${it.outcome}</strong><div style="font-size:12px;color:#ccc">${dText}</div></div><div style="text-align:right"><div style="font-weight:700">${it.total}</div><div style="font-size:11px;color:#999">${dateStr}</div></div>`;
+    wrap.appendChild(el);
+  });
+  document.getElementById('histCount').textContent = users[currentUser].history.length;
+}
+
+/* render stats: count tai/xiu/triple on entire history */
+function renderStats(){
+  if(!currentUser || !users[currentUser] || !users[currentUser].history) {
+    document.getElementById('statTai').textContent = 'Tài: 0';
+    document.getElementById('statXiu').textContent = 'Xỉu: 0';
+    document.getElementById('statTriple').textContent = 'Bộ3: 0';
+    return;
+  }
+  let tai=0,xiu=0,tr=0;
+  users[currentUser].history.forEach(it=>{
+    if(it.outcome==='Tài') tai++;
+    else if(it.outcome==='Xỉu') xiu++;
+    else tr++;
+  });
+  document.getElementById('statTai').textContent = `Tài: ${tai}`;
+  document.getElementById('statXiu').textContent = `Xỉu: ${xiu}`;
+  document.getElementById('statTriple').textContent = `Bộ3: ${tr}`;
+}
+
+/* CHAT (local) */
+function getChat(){ return JSON.parse(localStorage.getItem(STORAGE_CHAT) || '[]'); }
+function saveChat(arr){ localStorage.setItem(STORAGE_CHAT, JSON.stringify(arr)); }
+function renderChat(){
+  const hist = getChat();
+  const wrap = document.getElementById('chatHistory');
+  wrap.innerHTML = '';
+  hist.slice(-200).forEach(m=>{
+    const el = document.createElement('div');
+    el.className = 'msg';
+    const time = new Date(m.ts).toLocaleTimeString();
+    el.innerHTML = `<strong>${escapeHtml(m.user)}</strong><div style="font-size:14px;color:#fff">${escapeHtml(m.text)}</div><div style="font-size:11px;color:#aaa;margin-top:4px">${time}</div>`;
+    wrap.appendChild(el);
+  });
+  wrap.scrollTop = wrap.scrollHeight;
+}
+function sendChat(){
+  const txt = document.getElementById('chatInput').value.trim();
+  if(!txt) return;
+  const user = currentUser || 'Khách';
+  const arr = getChat();
+  arr.push({ user, text: txt, ts: Date.now() });
+  saveChat(arr);
+  document.getElementById('chatInput').value = '';
+  renderChat();
+}
+function clearChat(){
+  if(!confirm('Xóa toàn bộ chat local trên trình duyệt?')) return;
+  localStorage.removeItem(STORAGE_CHAT);
+  renderChat();
+}
+
+/* REDEEM CODE (nạp) */
+function redeemCode(){
+  if(!currentUser){ alert('Bạn phải đăng nhập để nạp mã'); return; }
+  const code = document.getElementById('codeInput').value.trim();
+  if(!code){ document.getElementById('redeemMsg').textContent = 'Nhập mã đã.'; return; }
+  const u = users[currentUser];
+  u.redeemed = u.redeemed || [];
+  if(u.redeemed.includes(code)){
+    document.getElementById('redeemMsg').textContent = 'Mã đã sử dụng rồi.';
+    return;
+  }
+  // give 100k
+  const amount = 100000;
+  u.balance = (u.balance || 0) + amount;
+  u.redeemed.push(code);
+  saveUsers();
+  updateBalance();
+  document.getElementById('redeemMsg').textContent = `Nạp thành công +${amount.toLocaleString()} đ`;
+  document.getElementById('codeInput').value = '';
+}
+
+/* small util */
+function escapeHtml(str){
+  return (str+'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]});
+}
+function goToGit(){ window.open('https://github.com','_blank') }
+</script>
+</body>
+</html>
